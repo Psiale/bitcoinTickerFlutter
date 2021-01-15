@@ -10,8 +10,8 @@ class PriceScreen extends StatefulWidget {
 class _PriceScreenState extends State<PriceScreen> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-       child: child,
+    return Scaffold(
+      appBar: AppBar(),
     );
   }
 }
