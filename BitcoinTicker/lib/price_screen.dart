@@ -13,12 +13,12 @@ class PriceScreen extends StatefulWidget {
 }
 
 class _PriceScreenState extends State<PriceScreen> {
-  final CriptoCurrency criptoCurrency = new CriptoCurrency();
-  String dropDownValue = 'MXN';
+  //final CriptoCurrency criptoCurrency = new CriptoCurrency();
+  String dropDownValue = 'USD';
   int selectedValue;
-  String btcCoinExchangeValue = "713476";
-  String ethCoinExchangeValue = "191919";
-  String ltcCoinExchangeValue = "101010";
+  String btcCoinExchangeValue = "31388";
+  String ethCoinExchangeValue = "1146";
+  String ltcCoinExchangeValue = "132";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,19 +59,20 @@ class _PriceScreenState extends State<PriceScreen> {
         elevation: 16,
         style: kdropDownItem,
         dropdownColor: Color(0xFF060047),
-        onChanged: (String newValue) async {
-          var btcCoinData =
-              await criptoCurrency.getCoinData(cryptoList[0], newValue);
-          var ethCoinData =
-              await criptoCurrency.getCoinData(cryptoList[1], newValue);
-          var ltcCoinData =
-              await criptoCurrency.getCoinData(cryptoList[2], newValue);
-          setState(() {
-            dropDownValue = newValue;
-            btcCoinExchangeValue = btcCoinData['rate'].toStringAsFixed(0);
-            ethCoinExchangeValue = ethCoinData['rate'].toStringAsFixed(0);
-            ltcCoinExchangeValue = ltcCoinData['rate'].toStringAsFixed(0);
-          });
+        onChanged: (String newValue) {
+          _onLoading(context, newValue);
+          // var btcCoinData =
+          //     await criptoCurrency.getCoinData(cryptoList[0], newValue);
+          // var ethCoinData =
+          //     await criptoCurrency.getCoinData(cryptoList[1], newValue);
+          // var ltcCoinData =
+          //     await criptoCurrency.getCoinData(cryptoList[2], newValue);
+          // setState(() {
+          //   dropDownValue = newValue;
+          //   btcCoinExchangeValue = btcCoinData['rate'].toStringAsFixed(0);
+          //   ethCoinExchangeValue = ethCoinData['rate'].toStringAsFixed(0);
+          //   ltcCoinExchangeValue = ltcCoinData['rate'].toStringAsFixed(0);
+          // });
         },
         items: currenciesList.map<DropdownMenuItem<String>>((String value) {
           return DropdownMenuItem<String>(
@@ -88,19 +89,20 @@ class _PriceScreenState extends State<PriceScreen> {
       offAxisFraction: 0.5,
       looping: true,
       backgroundColor: Color(0xFF060047),
-      onSelectedItemChanged: (int currentValue) async {
-        var btcCoinData = await criptoCurrency.getCoinData(
-            cryptoList[0], currenciesList[selectedValue]);
-        var ethCoinData = await criptoCurrency.getCoinData(
-            cryptoList[1], currenciesList[selectedValue]);
-        var ltcCoinData = await criptoCurrency.getCoinData(
-            cryptoList[2], currenciesList[selectedValue]);
-        setState(() {
-          selectedValue = currentValue;
-          btcCoinExchangeValue = btcCoinData['rate'].toStringAsFixed(0);
-          ethCoinExchangeValue = ethCoinData['rate'].toStringAsFixed(0);
-          ltcCoinExchangeValue = ltcCoinData['rate'].toStringAsFixed(0);
-        });
+      onSelectedItemChanged: (int currentValue) {
+        _onLoading(context, currentValue);
+        // var btcCoinData = await criptoCurrency.getCoinData(
+        //     cryptoList[0], currenciesList[currentValue]);
+        // var ethCoinData = await criptoCurrency.getCoinData(
+        //     cryptoList[1], currenciesList[currentValue]);
+        // var ltcCoinData = await criptoCurrency.getCoinData(
+        //     cryptoList[2], currenciesList[currentValue]);
+        // setState(() {
+        //   selectedValue = currentValue;
+        //   btcCoinExchangeValue = btcCoinData['rate'].toStringAsFixed(0);
+        //   ethCoinExchangeValue = ethCoinData['rate'].toStringAsFixed(0);
+        //   ltcCoinExchangeValue = ltcCoinData['rate'].toStringAsFixed(0);
+        // });
       },
       diameterRatio: 2.1,
       itemExtent: 50.0,
@@ -112,6 +114,79 @@ class _PriceScreenState extends State<PriceScreen> {
           )
       ],
     );
+  }
+
+  _onLoading(BuildContext context, newValue) {
+    final CriptoCurrency criptoCurrency = CriptoCurrency();
+    showIOSDialog() {
+      showCupertinoDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) {
+            return CupertinoDialogAction(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  CircularProgressIndicator(),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Text(
+                      "Loading",
+                      style: kdropDownItem,
+                    ),
+                  )
+                ],
+              ),
+            );
+          });
+    }
+
+    showAndroidDialog() {
+      showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) {
+            return Dialog(
+              backgroundColor: Color(0xFF060047),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16.0),
+                    child: CircularProgressIndicator(),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    child: Text(
+                      "Loading",
+                      style: kdropDownItem,
+                    ),
+                  )
+                ],
+              ),
+            );
+          });
+    }
+
+    (Platform.isIOS) ? showAndroidDialog() : showIOSDialog();
+    Future.delayed(Duration(seconds: 1), () async {
+      Navigator.pop(context);
+      var btcCoinData = await criptoCurrency.getCoinData(cryptoList[0],
+          (newValue is String) ? newValue : currenciesList[newValue]);
+      var ethCoinData = await criptoCurrency.getCoinData(cryptoList[1],
+          (newValue is String) ? newValue : currenciesList[newValue]);
+      var ltcCoinData = await criptoCurrency.getCoinData(cryptoList[2],
+          (newValue is String) ? newValue : currenciesList[newValue]);
+      setState(() {
+        dropDownValue = newValue;
+        btcCoinExchangeValue = btcCoinData['rate'].toStringAsFixed(0);
+        ethCoinExchangeValue = ethCoinData['rate'].toStringAsFixed(0);
+        ltcCoinExchangeValue = ltcCoinData['rate'].toStringAsFixed(0);
+      });
+    });
   }
 }
 
