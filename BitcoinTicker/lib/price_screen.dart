@@ -124,19 +124,28 @@ class _PriceScreenState extends State<PriceScreen> {
           barrierDismissible: false,
           builder: (context) {
             return CupertinoDialogAction(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  CircularProgressIndicator(),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: Text(
-                      "Loading",
-                      style: kdropDownItem,
-                    ),
-                  )
-                ],
+              child: Center(
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15.0),
+                      color: Color.fromRGBO(6, 0, 71, .7)),
+                  width: MediaQuery.of(context).size.width * 0.6,
+                  height: MediaQuery.of(context).size.height * 0.3,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      CircularProgressIndicator(),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: Text(
+                          "Loading",
+                          style: kdropDownItem,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
               ),
             );
           });
@@ -171,7 +180,7 @@ class _PriceScreenState extends State<PriceScreen> {
           });
     }
 
-    (Platform.isIOS) ? showAndroidDialog() : showIOSDialog();
+    (Platform.isAndroid) ? showAndroidDialog() : showIOSDialog();
     Future.delayed(Duration(seconds: 1), () async {
       Navigator.pop(context);
       var btcCoinData = await criptoCurrency.getCoinData(cryptoList[0],
@@ -181,7 +190,9 @@ class _PriceScreenState extends State<PriceScreen> {
       var ltcCoinData = await criptoCurrency.getCoinData(cryptoList[2],
           (newValue is String) ? newValue : currenciesList[newValue]);
       setState(() {
-        dropDownValue = newValue;
+        (newValue is String)
+            ? dropDownValue = newValue
+            : dropDownValue = currenciesList[newValue];
         btcCoinExchangeValue = btcCoinData['rate'].toStringAsFixed(0);
         ethCoinExchangeValue = ethCoinData['rate'].toStringAsFixed(0);
         ltcCoinExchangeValue = ltcCoinData['rate'].toStringAsFixed(0);
